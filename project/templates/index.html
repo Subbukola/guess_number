@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Number Guessing Game</title>
+    <style>
+        body {
+            text-align: center;
+            margin-top: 50px;
+            font-family: Arial, sans-serif;
+        }
+    </style>
+</head>
+<body>
+    <h1>Welcome to the Number Guessing Game!</h1>
+    <p>I'm thinking of a number between 1 and 100.</p>
+    <form id="guessForm">
+        <label for="guess">Enter your guess:</label>
+        <input type="number" id="guess" name="guess" required>
+        <br>
+        <button type="button" onclick="submitGuess()">Guess</button>
+    </form>
+    <p id="result"></p>
+
+    <script>
+        function submitGuess() {
+            var guess = document.getElementById('guess').value;
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', '/guess', true);
+            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    var response = JSON.parse(xhr.responseText);
+                    handleResponse(response);
+                }
+            };
+            xhr.send('guess=' + guess);
+        }
+
+        function handleResponse(response) {
+            var resultElement = document.getElementById('result');
+            if (response.result === 'correct') {
+                resultElement.innerHTML = 'Congratulations! You guessed the correct number in ' + response.attempts + ' attempts.';
+            } else if (response.result === 'low') {
+                resultElement.innerHTML = 'Too low! Try again.';
+            } else if (response.result === 'high') {
+                resultElement.innerHTML = 'Too high! Try again.';
+            } else if (response.result === 'error') {
+                resultElement.innerHTML = 'Error: ' + response.message;
+            }
+        }
+    </script>
+</body>
+</html>
+
